@@ -9,5 +9,6 @@
         public required string Descripcion { get; set; }
         public required string TipoInput { get; set; }
         public required bool Requerido { get; set; }
+        public List<RespuestaEncuesta> Resuestas { get; set; }
     }
 }

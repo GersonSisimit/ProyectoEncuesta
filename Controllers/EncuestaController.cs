@@ -319,6 +319,10 @@ namespace ProyectoEncuesta.Controllers
             {
                 using (SqlCommand command = new SqlCommand("EditEncuesta", connection))
                 {
+                    if (encuesta.Descripcion == null)
+                    {
+                        encuesta.Descripcion = "";
+                    }
                     command.CommandType = CommandType.StoredProcedure;
                     command.Parameters.AddWithValue("@IDEncuesta", encuesta.IDEncuesta);
                     command.Parameters.AddWithValue("@Nombre", encuesta.Nombre);
@@ -328,7 +332,8 @@ namespace ProyectoEncuesta.Controllers
                 }
             }
 
-            return RedirectToAction("Administrar");
+            return RedirectToAction("EditarEncuesta", new { Id = Encriptar(encuesta.IDEncuesta) });
+
         }
 
 
@@ -382,6 +387,133 @@ namespace ProyectoEncuesta.Controllers
             return RedirectToAction("Administrar"); // Fallback action if referer is null or empty
         }
 
+
+        public IActionResult VerRespuestas(string Id)
+        {
+            int IDEncuesta = 0;
+            try
+            {
+                IDEncuesta = Desencriptar(Id);
+            }
+            catch (Exception)
+            {
+                return StatusCode(404, "Not found");
+            }
+
+            Encuesta encuesta = null;
+
+            using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                SqlCommand cmd = new SqlCommand("sp_SelectEncuesta", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@IDEncuesta", IDEncuesta);
+
+                conn.Open();
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        encuesta = new Encuesta
+                        {
+                            IDEncuesta = Convert.ToInt32(reader["IDEncuesta"]),
+                            Nombre = reader["Nombre"].ToString(),
+                            Descripcion = reader["Descripcion"].ToString()
+                        };
+                    }
+                }
+            }
+            if (encuesta == null)
+            {
+                return StatusCode(404, "Not found");
+            }
+            List<CampoEncuesta> campos = new List<CampoEncuesta>();
+
+            using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                SqlCommand cmd = new SqlCommand("sp_SelectCamposPorEncuesta", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@IDEncuesta", IDEncuesta);
+
+                conn.Open();
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        CampoEncuesta campo = new CampoEncuesta
+                        {
+                            IDCampoEncuesta = Convert.ToInt32(reader["IDCampoEncuesta"]),
+                            IDEncuesta = Convert.ToInt32(reader["IDEncuesta"]),
+                            NombreCampo = reader["NombreCampo"].ToString(),
+                            Titulo = reader["Titulo"].ToString(),
+                            Descripcion = reader["Descripcion"].ToString(),
+                            TipoInput = reader["TipoInput"].ToString(),
+                            Requerido = Convert.ToBoolean(reader["Requerido"]),
+                            Resuestas = new List<RespuestaEncuesta>()
+                        };
+
+                        using (SqlConnection conn2 = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                        {
+                            SqlCommand cmd2 = new SqlCommand("GetRespuestasPorCampo", conn2);
+                            cmd2.CommandType = CommandType.StoredProcedure;
+                            cmd2.Parameters.AddWithValue("@IDCampoEncuesta", campo.IDCampoEncuesta);
+
+                            conn2.Open();
+                            using (SqlDataReader reader2 = cmd2.ExecuteReader())
+                            {
+                                while (reader2.Read())
+                                {
+                                    RespuestaEncuesta respuesta = new RespuestaEncuesta
+                                    {
+                                        IDRespuestaEncuesta = Convert.ToInt32(reader2["IDRespuestaEncuesta"]),
+                                        IDCampoEncuesta = Convert.ToInt32(reader2["IDCampoEncuesta"]),
+                                        Respuesta = reader2["Respuesta"].ToString(),
+                                        FechaRespuesta = Convert.ToDateTime(reader2["FechaRespuesta"])
+                                    };
+                                    campo.Resuestas.Add(respuesta);
+                                }
+                            }
+                        }
+                        campos.Add(campo);
+                    }
+                }
+            }
+            encuesta.Campos = campos;
+
+            return View(encuesta);
+        }
+
+
+        public IActionResult RespuestaEncuestas()
+        {
+            List<Encuesta> encuestas = new List<Encuesta>();
+
+            using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                using (SqlCommand command = new SqlCommand("GetAllEncuestas", connection))
+                using (SqlCommand command = new SqlCommand("GetAllEncuestas", connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    connection.Open();
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Encuesta encuesta = new Encuesta
+                            {
+                                IDEncuesta = Convert.ToInt32(reader["IDEncuesta"]),
+                                Nombre = reader["Nombre"].ToString(),
+                                Descripcion = reader["Descripcion"].ToString(),
+                                IdAux = Encriptar(Convert.ToInt32(reader["IDEncuesta"]))
+                            };
+                            encuestas.Add(encuesta);
+                        }
+                    }
+                }
+            }
+
+            return View(encuestas);
+        }
 
         #endregion
 
