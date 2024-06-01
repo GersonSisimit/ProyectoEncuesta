@@ -210,7 +210,8 @@ namespace ProyectoEncuesta.Controllers
                             {
                                 IDEncuesta = Convert.ToInt32(reader["IDEncuesta"]),
                                 Nombre = reader["Nombre"].ToString(),
-                                Descripcion = reader["Descripcion"].ToString()
+                                Descripcion = reader["Descripcion"].ToString(),
+                                IdAux = Encriptar(Convert.ToInt32(reader["IDEncuesta"]))
                             };
                             encuestas.Add(encuesta);
                         }
@@ -219,12 +220,6 @@ namespace ProyectoEncuesta.Controllers
             }
 
             return View(encuestas);
-        }
-
-        public IActionResult AgregarCampoEncuesta2(int Id)
-        {
-            // Logic for adding a field to the survey with the given Id
-            return View();
         }
 
         [HttpPost]

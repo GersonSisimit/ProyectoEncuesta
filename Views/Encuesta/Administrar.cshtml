@@ -23,7 +23,7 @@
                 <td>@encuesta.Nombre</td>
                 <td>@encuesta.Descripcion</td>
                 <td>
-                    <a href="@Url.Action("AgregarCampoEncuesta", new { Id = encuesta.IDEncuesta })" class="btn btn-primary">
+                    <a href="@Url.Action("AgregarCampoEncuesta", new { Id = encuesta.IdAux })" class="btn btn-primary">
                         <i class="fa fa-plus"></i> Agregar Campo
                     </a>
                     <form asp-action="EliminarEncuesta" method="post" style="display:inline;">
