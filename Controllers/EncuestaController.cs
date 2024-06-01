@@ -490,7 +490,6 @@ namespace ProyectoEncuesta.Controllers
             using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
             {
                 using (SqlCommand command = new SqlCommand("GetAllEncuestas", connection))
-                using (SqlCommand command = new SqlCommand("GetAllEncuestas", connection))
                 {
                     command.CommandType = CommandType.StoredProcedure;
                     connection.Open();
