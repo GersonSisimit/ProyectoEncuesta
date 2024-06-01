@@ -1,0 +1,44 @@
+﻿
+@model string
+@{
+    Layout = "~/Views/Shared/_LayoutResponderEncuesta.cshtml";
+    string encuestaRuta = ViewBag.EncuestaRuta;
+}
+
+<div class="container">
+    <div class="content">
+        <h1>¡Gracias por llenar la encuesta!</h1>
+        <p>Valoramos tu tiempo y tus respuestas.</p>
+        <a href="@encuestaRuta" class="btn btn-primary">Llenar de nuevo la encuesta</a>
+    </div>
+</div>
+
+<style>
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        text-align: center;
+    }
+
+    .content {
+        margin-top: -50px;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 5px;
+        display: inline-block;
+        margin-top: 20px;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #004085;
+    }
+</style>

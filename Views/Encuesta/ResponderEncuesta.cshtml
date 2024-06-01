@@ -1,0 +1,54 @@
+﻿@model Encuesta
+@{
+    Layout = "~/Views/Shared/_LayoutResponderEncuesta.cshtml";
+}
+
+<div class="container mt-5">
+    <h2>Detalles de la Encuesta</h2>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Nombre: @Model.Nombre</h5>
+            <p class="card-text">Descripción: @Model.Descripcion</p>
+        </div>
+    </div>
+</div>
+
+
+<div class="container mt-5">
+    <h2>Rellene los campos solicitados</h2>
+    <hr />
+    <form asp-action="LlenarEncuesta" method="post">
+        @foreach (var campo in Model.Campos)
+        {
+            <div class="card">
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="Titulo">@campo.Titulo</label>
+                        <p>@campo.Descripcion</p>
+                        <p>
+                            @if (campo.Requerido)
+                            {
+                                <span style="color:#E74C3C">Obligatorio*</span>
+                            }
+                            else
+                            {
+                                <span style="color:#2E86C1">Opcional</span>
+                            }
+                        </p>
+                        <input type="@campo.TipoInput" class="form-control" id="@campo.Titulo" name="@campo.IDCampoEncuesta" @(campo.Requerido ? "required" : "")>
+                    </div>
+                </div>
+            </div>
+        }
+        <div class="card" style="text-align:center">
+            <div class="card-body">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar Respuesta</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+
+
+

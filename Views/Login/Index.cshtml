@@ -1,0 +1,67 @@
+﻿@{
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+    string ResultadoLogin = "";
+    string MensajeResultado = "";
+
+    if (TempData["Resultado"] != null)
+    {
+        ResultadoLogin = TempData["Resultado"].ToString();
+        MensajeResultado = TempData["Mensaje"].ToString();
+    }
+}
+
+<div class="login-box">
+    @*  <div class="login-logo">
+    <span>Agroservicio</span>
+    </div> *@
+    <!-- /.login-logo -->
+    <div class="card">
+        <div class="card-body login-card-body">
+            <p class="login-box-msg">Inicia sesión para comenzar</p>
+
+            <form action="/Login/Login" method="post">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" name="Nombre" placeholder="Usuario" required>
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-user"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group mb-3">
+                    <input type="password" class="form-control" name="Contraseña" placeholder="Contraseña" required>
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-lock"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <button type="submit" class="btn btn-primary btn-block">Login</button>
+                </div>
+            </form>
+        </div>
+        <!-- /.login-card-body -->
+    </div>
+</div>
+@section Scripts {
+    <script>
+        var Resultado = '@ResultadoLogin'; // Agregar comillas simples alrededor de ResultadoLogin
+        var Mensaje = '@MensajeResultado'; // Agregar comillas simples alrededor de MensajeResultado
+
+        var Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000
+        });
+
+        if (Resultado === "Error") { // Comprobación estricta de igualdad con '==='
+            Toast.fire({
+                icon: 'error',
+                title: Mensaje
+            })
+        }
+    </script>
+
+}

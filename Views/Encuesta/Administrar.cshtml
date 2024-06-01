@@ -1,0 +1,42 @@
+﻿@model List<Encuesta>
+
+@{
+    ViewData["Title"] = "Administrar Encuestas";
+}
+
+<h2>Administrar Encuestas</h2>
+
+<table class="table table-striped table-bordered">
+    <thead class="thead-dark">
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var encuesta in Model)
+        {
+            <tr>
+                <td>@encuesta.IDEncuesta</td>
+                <td>@encuesta.Nombre</td>
+                <td>@encuesta.Descripcion</td>
+                <td>
+                    <a href="@Url.Action("AgregarCampoEncuesta", new { Id = encuesta.IDEncuesta })" class="btn btn-primary">
+                        <i class="fa fa-plus"></i> Agregar Campo
+                    </a>
+                    <form asp-action="EliminarEncuesta" method="post" style="display:inline;">
+                        <input type="hidden" name="id" value="@encuesta.IDEncuesta" />
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('¿Está seguro de que desea eliminar esta encuesta?');">
+                            <i class="fa fa-trash"></i> Eliminar
+                        </button>
+                    </form>
+                    <a href="@Url.Action("EditarEncuesta", new { Id = encuesta.IDEncuesta })" class="btn btn-warning">
+                        <i class="fa fa-edit"></i> Editar
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

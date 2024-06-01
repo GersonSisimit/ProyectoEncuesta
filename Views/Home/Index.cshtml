@@ -1,0 +1,46 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    @if (Context.User.Identity.IsAuthenticated == true)
+    {
+        <h1>
+            Bienvenido @Context.User.Identity.Name
+        </h1>
+        <hr />
+    }
+
+ <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-plus-circle"></i> Crear encuesta</h5>
+                        <p class="card-text">Crea una nueva encuesta</p>
+                        <a href="@Url.Action("Index", "Encuesta")" class="btn btn-success"><i class="fas fa-edit"></i> Crear encuesta</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-poll-h"></i> Ver resultados encuesta</h5>
+                        <p class="card-text">Revisar los resultados de encuestas generadas</p>
+                        <a href="@Url.Action("Index", "Encuesta")" class="btn btn-primary"><i class="fas fa-chart-bar"></i> Ver respuestas</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-tasks"></i> Administrar encuestas</h5>
+                        <p class="card-text">Gestionar las encuestas existentes</p>
+                        <a href="@Url.Action("Administrar", "Encuesta")" class="btn btn-warning"><i class="fas fa-cogs"></i> Administrar encuestas</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

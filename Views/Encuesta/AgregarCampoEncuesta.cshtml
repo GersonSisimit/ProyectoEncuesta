@@ -1,0 +1,127 @@
+﻿@model Encuesta
+@{
+    int IdEncuesta = 0;
+    if (ViewBag.IdEncuesta != null)
+    {
+        IdEncuesta = (int)ViewBag.IdEncuesta;
+    }
+}
+<body>
+    <div class="container mt-5">
+        <h2 class="text-center"><i class="fas fa-info-circle"></i> Detalles de la Encuesta</h2>
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-poll"></i> Nombre: @Model.Nombre</h5>
+                <p class="card-text"><i class="fas fa-align-left"></i> Descripción: @Model.Descripcion</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-5" style="padding-left:0%">
+                <div class="container mt-1">
+                    <h2><i class="fas fa-plus-circle"></i> Crear Campo</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            <form asp-action="CrearCampoEncuesta" method="post">
+                                <input type="hidden" class="form-control" id="IDEncuesta" name="IDEncuesta" value="@Model.IDEncuesta" required>
+                                <div class="form-group">
+                                    <label for="NombreCampo" class="font-weight-bold">
+                                         Nombre
+                                    </label>
+                                    <input type="text" class="form-control" id="NombreCampo" name="NombreCampo" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="Titulo" class="font-weight-bold">
+                                         Título
+                                    </label>
+                                    <input type="text" class="form-control" id="Titulo" name="Titulo" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="Descripcion" class="font-weight-bold">
+                                        <i class="fas fa-align-left"></i> Descripción <span style="color:#2E86C1">**Opcional**</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="Descripcion" name="Descripcion">
+                                </div>
+                                <div class="form-group">
+                                    <label for="Requerido" class="font-weight-bold">
+                                        <i class="fas fa-exclamation-circle"></i> El campo es obligatorio
+                                    </label>
+                                    <select class="form-control" id="Requerido" name="Requerido" required>
+                                        <option value="true">Sí</option>
+                                        <option value="false">No</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="TipoInput" class="font-weight-bold">
+                                        <i class="fas fa-database"></i> Tipo de dato a solicitar
+                                    </label>
+                                    <select class="form-control" id="TipoInput" name="TipoInput" required>
+                                        <option value="text">Texto</option>
+                                        <option value="date">Fecha</option>
+                                        <option value="number">Número</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block">
+                                    <i class="fas fa-paper-plane"></i> Crear Campo de Encuesta
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 offset-1" style="padding-left:0%;padding-right:0%">
+                <div class="container mt-6">
+                    <h2><i class="fas fa-list"></i> Campos de la Encuesta</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th> Título</th>
+                                            <th><i class="fas fa-align-left"></i> Descripción</th>
+                                            <th><i class="fas fa-keyboard"></i> Tipo</th>
+                                            <th><i class="fas fa-check-circle"></i> Requerido</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var campo in Model.Campos)
+                                        {
+                                            <tr>
+                                                <td>@campo.Titulo</td>
+                                                <td>@campo.Descripcion</td>
+                                                @switch (campo.TipoInput)
+                                                {
+                                                    case "number":
+                                                        <td>Número</td>
+                                                        break;
+                                                    case "date":
+                                                        <td>Fecha</td>
+                                                        break;
+                                                    case "text":
+                                                        <td>Texto</td>
+                                                        break;
+                                                }
+                                                <td>
+                                                    @if (campo.Requerido)
+                                                    {
+                                                        <i class="fas fa-check text-success"></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="fas fa-times text-danger"></i>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
