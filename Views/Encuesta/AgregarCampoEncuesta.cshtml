@@ -1,10 +1,6 @@
 ﻿@model Encuesta
 @{
-    int IdEncuesta = 0;
-    if (ViewBag.IdEncuesta != null)
-    {
-        IdEncuesta = (int)ViewBag.IdEncuesta;
-    }
+    
 }
 <body>
     <div class="container mt-5">
@@ -13,6 +9,12 @@
             <div class="card-body">
                 <h5 class="card-title"><i class="fas fa-poll"></i> Nombre: @Model.Nombre</h5>
                 <p class="card-text"><i class="fas fa-align-left"></i> Descripción: @Model.Descripcion</p>
+                @if (Model.Campos.Where(x=> x.Requerido == true).ToList().Count > 0)
+                {
+                    <button id="copyLinkButton" class="btn btn-secondary" data-id="@Model.IdAux">
+                        <i class="fa fa-copy"></i> Copiar link de acceso
+                    </button>
+                }
             </div>
         </div>
 
@@ -26,13 +28,13 @@
                                 <input type="hidden" class="form-control" id="IDEncuesta" name="IDEncuesta" value="@Model.IDEncuesta" required>
                                 <div class="form-group">
                                     <label for="NombreCampo" class="font-weight-bold">
-                                         Nombre
+                                         Nombre del campo
                                     </label>
                                     <input type="text" class="form-control" id="NombreCampo" name="NombreCampo" required>
                                 </div>
                                 <div class="form-group">
                                     <label for="Titulo" class="font-weight-bold">
-                                         Título
+                                         Título a mostrar
                                     </label>
                                     <input type="text" class="form-control" id="Titulo" name="Titulo" required>
                                 </div>
@@ -125,3 +127,19 @@
         </div>
     </div>
 </body>
+<script>
+    document.getElementById('copyLinkButton').addEventListener('click', function () {
+        var baseUrl = window.location.origin;
+        var idAux = this.getAttribute('data-id');
+        var relativeUrl = '@Url.Action("ResponderEncuesta")' + '?Id=' + idAux;
+        var fullUrl = baseUrl + relativeUrl;
+
+        var dummy = document.createElement('input');
+        document.body.appendChild(dummy);
+        dummy.value = fullUrl;
+        dummy.select();
+        document.execCommand('copy');
+        document.body.removeChild(dummy);
+        alert('Link copiado exitosamente ');
+    });
+</script>

@@ -1,0 +1,125 @@
+﻿@model Encuesta
+
+@{
+    ViewData["Title"] = "Editar Encuesta";
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4"><i class="fas fa-edit"></i> Editar Encuesta</h2>
+
+    <form asp-action="EditarEncuesta" method="post">
+        <input type="hidden" asp-for="IDEncuesta" />
+        <div class="mb-4 p-3 border rounded bg-light">
+            <h3 class="mb-3"><i class="fas fa-info-circle"></i> Encabezado de la Encuesta</h3>
+            <div class="form-group mb-3">
+                <label asp-for="Nombre" class="form-label"></label>
+                <input asp-for="Nombre" class="form-control" placeholder="Ingrese el nombre de la encuesta" />
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Descripcion" class="form-label"></label>
+                <textarea asp-for="Descripcion" class="form-control" placeholder="Ingrese la descripción de la encuesta"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Actualizar Encabezado</button>
+        </div>
+    </form>
+</div>
+
+
+<div class="container mt-5">
+    <h2>Campos de la encuesta</h2>
+    <hr />
+    @if (Model.Campos.Count ==0)
+    {
+        <div class="card">
+            <div class="card-body">
+                <h2>No hay campos, pude agregar campos desde  esta opcion</h2>
+                <a href="@Url.Action("AgregarCampoEncuesta", new { Id = Model.IdAux })" class="btn btn-primary">
+                    <i class="fa fa-plus"></i> Agregar Campo
+                </a>
+            </div>
+        </div>
+        
+    }
+    @foreach (var campo in Model.Campos)
+    {
+        <div class="card">
+            <div class="card-body">
+                <form asp-action="EditarCampoEncuesta" method="post">
+                    <input type="hidden" asp-for="@campo.IDCampoEncuesta" name="campo.IDCampoEncuesta" value="@campo.IDCampoEncuesta" />
+                    <input type="hidden" asp-for="@campo.IDEncuesta" name="campo.IDEncuesta" value="@campo.IDEncuesta" />
+                    <div class="form-group mb-3">
+                        <label for="NombreCampo" class="form-label">Nombre del Campo</label>
+                        <input type="text" class="form-control" id="NombreCampo" name="campo.NombreCampo" value="@campo.NombreCampo" placeholder="Ingrese el nombre del campo" />
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="Titulo" class="form-label">Título</label>
+                        <input type="text" class="form-control" id="Titulo" name="campo.Titulo" value="@campo.Titulo" placeholder="Ingrese el título del campo" />
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="Descripcion" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="Descripcion" name="campo.Descripcion" placeholder="Ingrese la descripción del campo">@campo.Descripcion</textarea>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="TipoInput" class="form-label">Tipo de Input</label>
+                        <select class="form-control" id="TipoInput" name="campo.TipoInput" required>
+                            @if (campo.TipoInput == "text")
+                            {
+                                <option value="text" selected>Texto</option>
+                                <option value="date">Fecha</option>
+                                <option value="number">Número</option>
+                            }
+                            else if (campo.TipoInput == "date")
+                            {
+                                <option value="text">Texto</option>
+                                <option value="date" selected>Fecha</option>
+                                <option value="number">Número</option>
+                            }
+                            else if (campo.TipoInput == "number")
+                            {
+                                <option value="text">Texto</option>
+                                <option value="date">Fecha</option>
+                                <option value="number" selected>Número</option>
+                            }
+                            else
+                            {
+                                <option value="text">Texto</option>
+                                <option value="date">Fecha</option>
+                                <option value="number">Número</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="Requerido" class="form-label">Requerido</label>
+                        <select class="form-control" id="Requerido" name="campo.Requerido" required>
+                            @if (campo.Requerido)
+                            {
+                                <option value="true" selected>Sí</option>
+                                <option value="false">No</option>
+                            }
+                            else
+                            {
+                                <option value="true">Sí</option>
+                                <option value="false" selected>No</option>
+                            }
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Actualizar Campo</button>
+                </form>
+                <form asp-action="EliminarCampoEncuesta" method="post" style="margin: 0;">
+                    <input type="hidden" name="id" value="@campo.IDCampoEncuesta" />
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('¿Está seguro de que desea eliminar este campo?');">
+                        <i class="fa fa-trash"></i> Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+           
+     
+    }
+
+</div>
+
+
+
+

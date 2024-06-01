@@ -69,7 +69,6 @@ namespace ProyectoEncuesta.Controllers
         }
         #endregion
 
-
         #region Crear encuesta
         public IActionResult Index()
         {
@@ -163,6 +162,7 @@ namespace ProyectoEncuesta.Controllers
                 }
             }
             encuesta.Campos = campos;
+            encuesta.IdAux = Id;
             return View(encuesta);
         }
 
@@ -223,14 +223,14 @@ namespace ProyectoEncuesta.Controllers
         }
 
         [HttpPost]
-        public IActionResult EliminarEncuesta(int id)
+        public IActionResult EliminarEncuesta(int Id)
         {
             using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
             {
                 using (SqlCommand command = new SqlCommand("DeleteEncuesta", connection))
                 {
                     command.CommandType = CommandType.StoredProcedure;
-                    command.Parameters.AddWithValue("@IDEncuesta", id);
+                    command.Parameters.AddWithValue("@IDEncuesta", Id);
                     connection.Open();
                     command.ExecuteNonQuery();
                 }
@@ -238,6 +238,79 @@ namespace ProyectoEncuesta.Controllers
 
             return RedirectToAction("Administrar");
         }
+
+
+        public IActionResult EditarEncuesta(string Id)
+        {
+            int IDEncuesta = 0;
+            try
+            {
+                IDEncuesta = Desencriptar(Id);
+            }
+            catch (Exception)
+            {
+                return StatusCode(404, "Not found");
+            }
+
+            Encuesta encuesta = null;
+
+            using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                SqlCommand cmd = new SqlCommand("sp_SelectEncuesta", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@IDEncuesta", IDEncuesta);
+
+                conn.Open();
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        encuesta = new Encuesta
+                        {
+                            IDEncuesta = Convert.ToInt32(reader["IDEncuesta"]),
+                            Nombre = reader["Nombre"].ToString(),
+                            Descripcion = reader["Descripcion"].ToString()
+                        };
+                    }
+                }
+            }
+            if (encuesta == null)
+            {
+                return StatusCode(404, "Not found");
+            }
+            List<CampoEncuesta> campos = new List<CampoEncuesta>();
+
+            using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                SqlCommand cmd = new SqlCommand("sp_SelectCamposPorEncuesta", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@IDEncuesta", IDEncuesta);
+
+                conn.Open();
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        CampoEncuesta campo = new CampoEncuesta
+                        {
+                            IDCampoEncuesta = Convert.ToInt32(reader["IDCampoEncuesta"]),
+                            IDEncuesta = Convert.ToInt32(reader["IDEncuesta"]),
+                            NombreCampo = reader["NombreCampo"].ToString(),
+                            Titulo = reader["Titulo"].ToString(),
+                            Descripcion = reader["Descripcion"].ToString(),
+                            TipoInput = reader["TipoInput"].ToString(),
+                            Requerido = Convert.ToBoolean(reader["Requerido"])
+                        };
+                        campos.Add(campo);
+                    }
+                }
+            }
+            encuesta.Campos = campos;
+            encuesta.IdAux = Id;
+
+            return View(encuesta);
+        }
+
 
         [HttpPost]
         public IActionResult EditarEncuesta(Encuesta encuesta)
@@ -259,23 +332,60 @@ namespace ProyectoEncuesta.Controllers
         }
 
 
+        [HttpPost]
+        public IActionResult EditarCampoEncuesta(CampoEncuesta campo)
+        {
+            using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                using (SqlCommand command = new SqlCommand("EditCampoEncuesta", connection))
+                {
+                    if (campo.Descripcion == null)
+                    {
+                        campo.Descripcion = "";
+                    }
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@IDCampoEncuesta", campo.IDCampoEncuesta);
+                    command.Parameters.AddWithValue("@NombreCampo", campo.NombreCampo);
+                    command.Parameters.AddWithValue("@Titulo", campo.Titulo);
+                    command.Parameters.AddWithValue("@Descripcion", campo.Descripcion);
+                    command.Parameters.AddWithValue("@TipoInput", campo.TipoInput);
+                    command.Parameters.AddWithValue("@Requerido", campo.Requerido);
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
+
+            return RedirectToAction("EditarEncuesta", new { Id = Encriptar(campo.IDEncuesta) });
+        }
+
+        [HttpPost]
+        public IActionResult EliminarCampoEncuesta(int id)
+        {
+            string refererUrl = Request.Headers["Referer"].ToString();
+
+            using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                using (SqlCommand command = new SqlCommand("DeleteCampoEncuesta", connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@IDCampoEncuesta", id);
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
+
+            if (!string.IsNullOrEmpty(refererUrl))
+            {
+                return Redirect(refererUrl);
+            }
+
+            return RedirectToAction("Administrar"); // Fallback action if referer is null or empty
+        }
+
+
         #endregion
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        #region Responder Encuesta
 
         [AllowAnonymous]
         public IActionResult ResponderEncuesta(string Id)
@@ -349,6 +459,7 @@ namespace ProyectoEncuesta.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public IActionResult LlenarEncuesta()
         {
@@ -387,20 +498,20 @@ namespace ProyectoEncuesta.Controllers
                     }
                 }
             }
-            catch 
+            catch
             {
                 return StatusCode(500, "Internal server error");
             }
 
-            return RedirectToAction("FinEncuesta", new { Ruta = Encriptar(respuestas[0].IDCampoEncuesta) });
+            return RedirectToAction("FinEncuesta", "Encuesta");
         }
 
 
         [AllowAnonymous]
-        public IActionResult FinEncuesta(string Ruta)
+        public IActionResult FinEncuesta()
         {
-
             return View();
         }
+        #endregion
     }
 }
