@@ -1,6 +1,9 @@
 Link para acceder al proyecto 
 
 http://13.90.151.37:85/
+Usuario:  Admin
+
+Password: @Devel#Encuesta
 
 Link de mapa de relaciones:
 https://drive.google.com/file/d/1fkKXIg_LezI9Va0kCYnsepiL0Eom9XBi/view?usp=sharing
