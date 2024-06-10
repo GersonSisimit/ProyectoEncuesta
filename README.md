@@ -1,8 +1,8 @@
 Link para acceder al proyecto 
 
 http://13.90.151.37:85/
-Usuario:  Admin
 
+Usuario:  Admin
 Password: @Devel#Encuesta
 
 Link de mapa de relaciones:
